@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git clone *)",
+      "Read(//c/Users/yusufbayram/.claude/**)",
+      "Read(//c/Users/yusufbayram/.claude/agents/**)",
+      "Read(//c/Users/yusufbayram/.claude/commands/**)",
+      "Bash(cp \"C:/Users/yusufbayram/Desktop/everything-claude-code/agents/\"*.md \"C:/Users/yusufbayram/.claude/agents/\")",
+      "Bash(cp \"C:/Users/yusufbayram/Desktop/everything-claude-code/commands/\"*.md \"C:/Users/yusufbayram/.claude/commands/\")",
+      "Bash(cp -r \"C:/Users/yusufbayram/Desktop/everything-claude-code/rules/.\" \"C:/Users/yusufbayram/.claude/rules/\")",
+      "Bash(cp -r \"C:/Users/yusufbayram/Desktop/everything-claude-code/hooks/.\" \"C:/Users/yusufbayram/.claude/hooks/\")",
+      "Bash(mkdir -p 'C:/Users/yusufbayram/Desktop/claude proje 1/src' 'C:/Users/yusufbayram/Desktop/claude proje 1/tests' 'C:/Users/yusufbayram/Desktop/claude proje 1/docs' 'C:/Users/yusufbayram/Desktop/claude proje 1/config' 'C:/Users/yusufbayram/Desktop/claude proje 1/scripts')",
+      "Bash(git init *)",
+      "Bash(npm install *)",
+      "Bash(npm run *)",
+      "mcp__Claude_in_Chrome__tabs_context_mcp",
+      "Bash(curl -s http://localhost:5173)",
+      "mcp__Claude_Preview__preview_start"
+    ]
+  }
+}
