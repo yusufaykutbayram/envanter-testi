@@ -17,7 +17,15 @@ export default function AdminLogin() {
       localStorage.setItem('adminToken', token);
       navigate('/admin/dashboard');
     } catch (err) {
-      setError(err.response?.data?.error || 'Giriş başarısız. Bilgileri kontrol edin.');
+      let errorMessage = 'Giriş başarısız. Bilgileri kontrol edin.';
+      if (err.response?.data?.error) {
+        errorMessage = typeof err.response.data.error === 'string' 
+          ? err.response.data.error 
+          : JSON.stringify(err.response.data.error);
+      } else if (err.message) {
+        errorMessage = err.message;
+      }
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }

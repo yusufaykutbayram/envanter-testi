@@ -12,7 +12,14 @@ const logger = winston.createLogger({
     winston.format.errors({ stack: true }),
     winston.format.json()
   ),
-  transports: [
+  transports: process.env.VERCEL ? [
+    new winston.transports.Console({
+      format: winston.format.combine(
+        winston.format.colorize(),
+        winston.format.simple()
+      ),
+    })
+  ] : [
     new winston.transports.File({ 
       filename: path.join('logs', 'error.log'), 
       level: 'error',
@@ -27,7 +34,7 @@ const logger = winston.createLogger({
   ],
 });
 
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
   logger.add(new winston.transports.Console({
     format: winston.format.combine(
       winston.format.colorize(),
