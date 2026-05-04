@@ -121,17 +121,16 @@ router.get('/personnel/:id/pdf', requireAdmin, async (req, res) => {
     if (!person) return res.status(404).json({ error: 'Personel bulunamadı' });
 
     const pdfBuffer = await generatePersonnelReportPDF(person);
+    const tempPath = join('/tmp', `rapor-${person.id}-${Date.now()}.pdf`);
+    fs.writeFileSync(tempPath, Buffer.from(pdfBuffer));
     
-    res.writeHead(200, {
-      'Content-Type': 'application/pdf',
-      'Content-Disposition': `attachment; filename=rapor-${person.id}.pdf`,
-      'Content-Length': pdfBuffer.length
+    res.download(tempPath, `rapor-${person.id}.pdf`, () => {
+      try { if (fs.existsSync(tempPath)) fs.unlinkSync(tempPath); } catch (e) {}
     });
-    res.end(Buffer.from(pdfBuffer));
   } catch (error) {
     logger.error(error);
     if (!res.headersSent) {
-        res.status(500).json({ error: 'PDF oluşturulamadı' });
+      res.status(500).json({ error: 'PDF oluşturulamadı' });
     }
   }
 });
@@ -223,13 +222,12 @@ router.get('/export/pdf', requireAdmin, async (req, res) => {
     const { data: people } = await db.from('personnel').select('*').in('id', ids);
 
     const pdfBuffer = await generateComparisonPDF({ people, analysis, fitAnalysis, recommendation: { winnerName: 'Seçilenler', reason: '...' } });
+    const tempPath = join('/tmp', `compare-${Date.now()}.pdf`);
+    fs.writeFileSync(tempPath, Buffer.from(pdfBuffer));
     
-    res.writeHead(200, {
-      'Content-Type': 'application/pdf',
-      'Content-Disposition': 'attachment; filename=karsilastirma.pdf',
-      'Content-Length': pdfBuffer.length
+    res.download(tempPath, 'karsilastirma.pdf', () => {
+      try { if (fs.existsSync(tempPath)) fs.unlinkSync(tempPath); } catch (e) {}
     });
-    res.end(Buffer.from(pdfBuffer));
   } catch (error) {
     if (!res.headersSent) {
       res.status(500).json({ error: 'PDF oluşturulamadı' });
