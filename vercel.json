@@ -3,7 +3,7 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "/backend/src/app.js"
+      "destination": "/api/index.js"
     },
     {
       "source": "/(.*)",
@@ -15,7 +15,7 @@
     }
   ],
   "functions": {
-    "backend/src/app.js": {
+    "api/index.js": {
       "memory": 1024,
       "maxDuration": 60
     }
