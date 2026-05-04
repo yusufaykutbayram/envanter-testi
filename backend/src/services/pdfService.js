@@ -4,15 +4,16 @@ import logger from '../utils/logger.js';
 
 async function getBrowser() {
   if (process.env.VERCEL) {
-    logger.info('Launching browser on Vercel...');
+    logger.info('Launching browser on Vercel (Stable Mode)...');
     return await puppeteer.launch({
-      args: [...chromium.args, '--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
+      args: [...chromium.args, '--hide-scrollbars', '--disable-web-security'],
       defaultViewport: chromium.defaultViewport,
       executablePath: await chromium.executablePath(),
-      headless: chromium.headless,
+      headless: true,
       ignoreHTTPSErrors: true,
     });
   }
+  logger.info('Launching browser locally...');
   logger.info('Launching browser locally...');
   return await puppeteer.launch({
     headless: 'new',
