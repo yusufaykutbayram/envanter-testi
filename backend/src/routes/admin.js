@@ -124,7 +124,7 @@ router.get('/personnel/:id/pdf', requireAdmin, async (req, res) => {
     
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename=rapor-${person.id}.pdf`);
-    res.send(pdfBuffer);
+    res.send(Buffer.from(pdfBuffer));
   } catch (error) {
     logger.error(error);
     res.status(500).json({ error: 'PDF oluşturulamadı' });
@@ -222,7 +222,7 @@ router.get('/export/pdf', requireAdmin, async (req, res) => {
     
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', 'attachment; filename=karsilastirma.pdf');
-    res.send(pdfBuffer);
+    res.send(Buffer.from(pdfBuffer));
   } catch (error) {
     res.status(500).json({ error: 'PDF oluşturulamadı' });
   }
