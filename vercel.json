@@ -23,11 +23,19 @@
       "destination": "backend/reports/$1"
     },
     {
+      "source": "/assets/(.*)",
+      "destination": "/frontend/assets/$1"
+    },
+    {
+      "source": "/(.*\\.(js|css|png|jpg|jpeg|svg|gif|ico|woff|woff2|ttf|eot))",
+      "destination": "/frontend/$1"
+    },
+    {
       "source": "/admin/(.*)",
       "destination": "/frontend/index.html"
     },
     {
-      "source": "/((?!api/|reports/).*)",
+      "source": "/((?!api/|reports/|assets/).*)",
       "destination": "/frontend/index.html"
     }
   ],
