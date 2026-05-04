@@ -15,8 +15,8 @@ export default function PersonnelDetail() {
       .finally(() => setLoading(false));
   }, [id]);
 
-  const handleExportPDF = () => {
-    adminApi.exportSinglePDF(id).catch(console.error);
+  const handleDownloadPDF = () => {
+    adminApi.directDownloadSinglePDF(id);
   };
 
   if (loading) return <div className="admin-page"><div className="admin-loading">Yükleniyor...</div></div>;

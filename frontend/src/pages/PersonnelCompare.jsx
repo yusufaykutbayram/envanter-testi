@@ -37,16 +37,8 @@ export default function PersonnelCompare() {
     }
   };
 
-  const generatePDF = async () => {
-    setIsExporting(true);
-    try {
-      await adminApi.exportPDF(ids);
-    } catch (error) {
-      console.error('PDF Export Error:', error);
-      alert(`HATA: ${error.message}`);
-    } finally {
-      setIsExporting(false);
-    }
+  const generatePDF = () => {
+    adminApi.directDownloadPDF(ids.split(','));
   };
 
   if (loading) return <div className="admin-loading">Analiz Hazırlanıyor...</div>;
