@@ -6,10 +6,10 @@
       "use": "@vercel/node"
     },
     {
-      "src": "frontend/package.json",
+      "src": "package.json",
       "use": "@vercel/static-build",
       "config": {
-        "distDir": "dist"
+        "distDir": "frontend/dist"
       }
     }
   ],
@@ -23,20 +23,8 @@
       "destination": "backend/reports/$1"
     },
     {
-      "source": "/assets/(.*)",
-      "destination": "/assets/$1"
-    },
-    {
-      "source": "/(.*\\.(js|css|png|jpg|jpeg|svg|gif|ico|woff|woff2|ttf|eot))",
-      "destination": "/$1"
-    },
-    {
-      "source": "/admin/(.*)",
-      "destination": "/frontend/index.html"
-    },
-    {
       "source": "/(.*)",
-      "destination": "/frontend/index.html"
+      "destination": "/index.html"
     }
   ],
   "env": {
