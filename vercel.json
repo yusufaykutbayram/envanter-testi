@@ -24,18 +24,18 @@
     },
     {
       "source": "/assets/(.*)",
-      "destination": "/frontend/assets/$1"
+      "destination": "/assets/$1"
     },
     {
       "source": "/(.*\\.(js|css|png|jpg|jpeg|svg|gif|ico|woff|woff2|ttf|eot))",
-      "destination": "/frontend/$1"
+      "destination": "/$1"
     },
     {
       "source": "/admin/(.*)",
       "destination": "/frontend/index.html"
     },
     {
-      "source": "/((?!api/|reports/|assets/).*)",
+      "source": "/(.*)",
       "destination": "/frontend/index.html"
     }
   ],
