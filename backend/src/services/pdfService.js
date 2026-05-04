@@ -1,268 +1,158 @@
-import puppeteer from 'puppeteer-core';
-import chromium from '@sparticuz/chromium';
+import PDFDocument from 'pdfkit';
+import SVGtoPDF from 'svg-to-pdfkit';
 import logger from '../utils/logger.js';
 
-async function getBrowser() {
-  if (process.env.VERCEL) {
-    logger.info('Launching browser on Vercel (Stable Mode)...');
-    return await puppeteer.launch({
-      args: [...chromium.args, '--hide-scrollbars', '--disable-web-security'],
-      defaultViewport: chromium.defaultViewport,
-      executablePath: await chromium.executablePath(),
-      headless: true,
-      ignoreHTTPSErrors: true,
-    });
-  }
-  logger.info('Launching browser locally...');
-  logger.info('Launching browser locally...');
-  return await puppeteer.launch({
-    headless: 'new',
-    args: ['--no-sandbox', '--disable-setuid-sandbox'],
-    // Local path adjust if needed or remove to let it find automatically
-    executablePath: process.platform === 'win32' 
-      ? 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe' 
-      : '/usr/bin/google-chrome'
-  });
-}
-
+// Radar SVG Generator (Same as before but simplified for PDFKit)
 function generateRadarSVG(people) {
-  const size = 280;
+  const size = 300;
   const center = size / 2;
-  const radius = size * 0.38;
-  const traits = ['e_score', 'a_score', 'c_score', 'n_score', 'o_score'];
-  const traitLabels = ['Dışadönüklük', 'Uyumluluk', 'Sorumluluk', 'Duygusal Denge', 'Deneyime Açıklık'];
-  const palette = ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444', '#06b6d4', '#ec4899'];
-  const MAX_SCORE = 100;
+  const radius = size * 0.4;
+  const factors = ['E', 'A', 'C', 'N', 'O'];
+  const labels = ['Dışadönüklük', 'Uyumluluk', 'Sorumluluk', 'Duygusal Denge', 'Deneyime Açıklık'];
 
-  const getPoint = (score, index) => {
-    const angle = (index * 2 * Math.PI / traits.length) - (Math.PI / 2);
-    const r = (Math.min(MAX_SCORE, Math.max(0, score)) / MAX_SCORE) * radius;
-    return {
-      x: center + r * Math.cos(angle),
-      y: center + r * Math.sin(angle)
-    };
-  };
-
-  let grid = '';
-  for (let i = 1; i <= 5; i++) {
-    const r = (i / 5) * radius;
-    const points = traits.map((_, idx) => {
-      const angle = (idx * 2 * Math.PI / traits.length) - (Math.PI / 2);
-      return `${center + r * Math.cos(angle)},${center + r * Math.sin(angle)}`;
-    }).join(' ');
-    grid += `<polygon points="${points}" fill="none" stroke="#cbd5e1" stroke-width="0.5" />`;
-    const angle = -Math.PI / 2;
-    grid += `<text x="${center}" y="${center - r}" font-size="6" fill="#94a3b8" text-anchor="middle" dy="-2">${i * 20}</text>`;
-  }
-
-  traits.forEach((_, idx) => {
-    const angle = (idx * 2 * Math.PI / traits.length) - (Math.PI / 2);
-    const cos = Math.cos(angle);
-    const sin = Math.sin(angle);
-    grid += `<line x1="${center}" y1="${center}" x2="${center + radius * cos}" y2="${center + radius * sin}" stroke="#cbd5e1" stroke-width="1" />`;
-    const labelR = radius + 15;
-    const lx = center + labelR * cos;
-    const ly = center + labelR * sin;
-    let anchor = 'middle';
-    if (cos > 0.2) anchor = 'start';
-    else if (cos < -0.2) anchor = 'end';
-    grid += `<text x="${lx}" y="${ly}" font-size="9" font-weight="700" text-anchor="${anchor}" fill="#475569" dominant-baseline="central">${traitLabels[idx]}</text>`;
+  let svg = `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">`;
+  
+  // Background Circles
+  [0.2, 0.4, 0.6, 0.8, 1].forEach(r => {
+    svg += `<circle cx="${center}" cy="${center}" r="${radius * r}" fill="none" stroke="#e2e8f0" stroke-width="1" />`;
   });
 
-  let polygons = '';
+  // Axis Lines & Labels
+  factors.forEach((f, i) => {
+    const angle = (Math.PI * 2 * i) / factors.length - Math.PI / 2;
+    const x = center + radius * Math.cos(angle);
+    const y = center + radius * Math.sin(angle);
+    svg += `<line x1="${center}" y1="${center}" x2="${x}" y2="${y}" stroke="#cbd5e1" stroke-width="1" />`;
+    
+    // Label
+    const lx = center + (radius + 25) * Math.cos(angle);
+    const ly = center + (radius + 25) * Math.sin(angle);
+    svg += `<text x="${lx}" y="${ly}" text-anchor="middle" font-size="10" fill="#64748b" font-family="Arial">${labels[i]}</text>`;
+  });
+
+  // Data Polygons
+  const colors = ['#e31e24', '#0f172a', '#3b82f6', '#10b981', '#f59e0b'];
   people.forEach((p, idx) => {
-    const color = palette[idx % palette.length];
-    const points = traits.map((trait, tIdx) => {
-      const pt = getPoint(p[trait], tIdx);
-      return `${pt.x},${pt.y}`;
+    const points = factors.map((f, i) => {
+      const score = p[`${f.toLowerCase()}_score`] || 0;
+      const angle = (Math.PI * 2 * i) / factors.length - Math.PI / 2;
+      const x = center + radius * (score / 100) * Math.cos(angle);
+      const y = center + radius * (score / 100) * Math.sin(angle);
+      return `${x},${y}`;
     }).join(' ');
-    polygons += `<polygon points="${points}" fill="${color}" fill-opacity="0.1" stroke="${color}" stroke-width="2.5" stroke-linejoin="round" />`;
+    
+    const color = colors[idx % colors.length];
+    svg += `<polygon points="${points}" fill="${color}" fill-opacity="0.3" stroke="${color}" stroke-width="2" />`;
   });
 
-  return `
-    <svg width="${size + 140}" height="${size + 60}" viewBox="0 0 ${size + 140} ${size + 60}" style="margin: 0 auto; display: block;">
-      <g transform="translate(70, 30)">
-        ${grid}
-        ${polygons}
-      </g>
-    </svg>
-  `;
-}
-
-export async function generateComparisonPDF(data) {
-  let browser;
-  try {
-    const palette = ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444', '#06b6d4', '#ec4899'];
-    browser = await getBrowser();
-    const page = await browser.newPage();
-    const radarSVG = generateRadarSVG(data.people);
-
-    const htmlContent = `
-    <!DOCTYPE html>
-    <html lang="tr">
-    <head>
-        <meta charset="UTF-8">
-        <style>
-            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
-            body { font-family: 'Inter', sans-serif; color: #0f172a; margin: 0; padding: 30px; background: #fff; }
-            @page { size: A4; margin: 0; }
-            .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e31e24; padding-bottom: 15px; margin-bottom: 20px; }
-            .logo { font-weight: 800; font-size: 22px; color: #e31e24; letter-spacing: -1px; }
-            .report-title { text-align: right; }
-            .report-title h1 { margin: 0; font-size: 18px; font-weight: 800; }
-            .recommendation-card { background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border: 1px solid #bae6fd; border-radius: 12px; padding: 15px; margin-bottom: 20px; }
-            .rec-badge { display: inline-block; padding: 3px 10px; background: #0369a1; color: white; border-radius: 99px; font-size: 10px; font-weight: 700; margin-bottom: 8px; }
-            .rec-winner { font-size: 16px; font-weight: 800; margin-bottom: 8px; }
-            .rec-reason { font-size: 12px; line-height: 1.5; color: #334155; }
-            .fit-row { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
-            .fit-name { width: 140px; font-weight: 600; font-size: 12px; }
-            .fit-bar-bg { flex: 1; height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden; }
-            .fit-bar-fill { height: 100%; border-radius: 4px; }
-            .fit-score { width: 45px; text-align: right; font-weight: 700; font-size: 12px; }
-            .visual-compare { display: flex; align-items: center; gap: 20px; margin-bottom: 30px; background: #f8fafc; padding: 15px; border-radius: 12px; border: 1px solid #f1f5f9; }
-            .radar-chart-container { flex: 1.2; }
-            .legend-container { flex: 0.8; display: flex; flex-direction: column; gap: 8px; }
-            .legend-item { display: flex; align-items: center; gap: 10px; font-size: 11px; }
-            .legend-color { width: 12px; height: 12px; border-radius: 3px; }
-            .section-title { font-size: 15px; font-weight: 800; margin: 20px 0 12px; border-left: 4px solid #e31e24; padding-left: 10px; }
-            .trait-grid { display: flex; flex-wrap: wrap; gap: 15px; justify-content: space-between; }
-            .trait-card { width: 48%; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px; margin-bottom: 5px; box-sizing: border-box; }
-            .trait-header { font-size: 10px; font-weight: 800; color: #e31e24; text-transform: uppercase; margin-bottom: 4px; }
-            .trait-title { font-size: 13px; font-weight: 700; margin-bottom: 8px; }
-            .trait-desc { font-size: 11px; color: #475569; margin-bottom: 10px; line-height: 1.4; }
-            .dynamic-box { padding: 8px; border-radius: 6px; font-size: 10px; margin-bottom: 4px; }
-            .synergy { background: #f0fdf4; color: #166534; border: 1px solid #dcfce7; }
-            .conflict { background: #fff1f2; color: #991b1b; border: 1px solid #fecdd3; }
-            .footer { position: fixed; bottom: 20px; left: 30px; right: 30px; font-size: 9px; color: #94a3b8; text-align: center; border-top: 1px solid #e2e8f0; padding-top: 8px; }
-        </style>
-    </head>
-    <body>
-        <div class="header">
-            <div class="logo">BORSAN AKADEMİ</div>
-            <div class="report-title"><h1>Personel Karşılaştırma Raporu</h1></div>
-        </div>
-        <div class="recommendation-card">
-            <div class="rec-badge">UZMAN ÖNERİSİ</div>
-            <div class="rec-winner">En Uygun Aday: ${data.recommendation.winnerName}</div>
-            <p class="rec-reason">${data.recommendation.reason}</p>
-            <div style="margin-top: 15px;">
-                ${data.fitAnalysis.map((p, idx) => `
-                    <div class="fit-row">
-                        <div class="fit-name">${p.name}</div>
-                        <div class="fit-bar-bg"><div class="fit-bar-fill" style="width: ${p.fitScore}%; background: ${palette[idx % palette.length]};"></div></div>
-                        <div class="fit-score">%${p.fitScore}</div>
-                    </div>
-                `).join('')}
-            </div>
-        </div>
-        <div class="section-title">Görsel Karşılaştırma</div>
-        <div class="visual-compare">
-            <div class="radar-chart-container">${radarSVG}</div>
-            <div class="legend-container">
-                ${data.people.map((p, idx) => `
-                    <div class="legend-item">
-                        <div class="legend-color" style="background: ${palette[idx % palette.length]}"></div>
-                        <div><span class="legend-name">${p.name}</span> <span class="legend-pos">(${p.position})</span></div>
-                    </div>
-                `).join('')}
-            </div>
-        </div>
-        <div class="section-title">İlişkisel Analiz</div>
-        <div class="trait-grid">
-            ${data.analysis.map(item => `
-                <div class="trait-card">
-                    <div class="trait-header">${item.label}</div>
-                    <div class="trait-title">${item.title}</div>
-                    <p class="trait-desc">${item.description}</p>
-                    <div class="dynamic-box synergy"><strong>Sinerji:</strong> ${item.synergy}</div>
-                    <div class="dynamic-box conflict"><strong>Olası Çatışma:</strong> ${item.potential_conflict}</div>
-                </div>
-            `).join('')}
-        </div>
-        <div class="footer">Borsan Akademi Envanter Analiz Sistemi &copy; ${new Date().getFullYear()}</div>
-    </body>
-    </html>
-    `;
-    await page.setContent(htmlContent, { waitUntil: 'networkidle2', timeout: 45000 });
-    const pdfBuffer = await page.pdf({ format: 'A4', printBackground: true });
-    await browser.close();
-    return pdfBuffer;
-  } catch (error) {
-    if (browser) await browser.close();
-    throw error;
-  }
+  svg += '</svg>';
+  return svg;
 }
 
 export async function generatePersonnelReportPDF(person) {
-  let browser;
-  try {
-    browser = await getBrowser();
-    const page = await browser.newPage();
-    const radarSVG = generateRadarSVG([person]);
-    const htmlContent = `
-    <!DOCTYPE html>
-    <html lang="tr">
-    <head>
-        <meta charset="UTF-8">
-        <style>
-            body { font-family: Arial, sans-serif; color: #1e293b; margin: 0; padding: 40px; background: #fff; }
-            .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #e31e24; padding-bottom: 20px; margin-bottom: 30px; }
-            .logo { font-weight: 800; font-size: 24px; color: #e31e24; }
-            .main-grid { display: flex; gap: 30px; margin-bottom: 30px; }
-            .info-panel { flex: 1; background: #f8fafc; border-radius: 16px; padding: 24px; border: 1px solid #e2e8f0; }
-            .suitability-card { flex: 1; background: #0f172a; color: white; border-radius: 16px; padding: 24px; text-align: center; }
-            .suit-score { font-size: 48px; font-weight: 800; }
-            .section-title { font-size: 16px; font-weight: 800; color: #e31e24; text-transform: uppercase; margin-bottom: 15px; }
-            .info-item { display: flex; justify-content: space-between; border-bottom: 1px dashed #cbd5e1; padding-bottom: 5px; margin-bottom: 10px; }
-            .ai-summary { background: #f1f5f9; padding: 20px; border-radius: 12px; margin-bottom: 25px; font-size: 14px; }
-            .ai-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-            .ai-box { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 15px; }
-        </style>
-    </head>
-    <body>
-        <div class="header">
-            <div class="logo">BORSAN AKADEMİ</div>
-            <div><h1>Kişilik Envanteri Analiz Raporu</h1></div>
-        </div>
-        <div class="main-grid">
-            <div class="info-panel">
-                <div class="section-title">Personel Bilgileri</div>
-                <div class="info-item"><label>Ad Soyad:</label> <span>${person.name}</span></div>
-                <div class="info-item"><label>Yaş:</label> <span>${person.age}</span></div>
-                <div class="info-item"><label>Sicil No:</label> <span>${person.employee_id || '—'}</span></div>
-                <div class="info-item"><label>Departman:</label> <span>${person.department || '—'}</span></div>
-                <div class="info-item"><label>Pozisyon:</label> <span>${person.position}</span></div>
-            </div>
-            <div class="suitability-card">
-                <div>Pozisyon Uygunluğu</div>
-                <div class="suit-score">${person.ai_job_fit.match(/\d+/)?.[0] || '—'}%</div>
-                <div>${person.ai_job_fit.split('(')[0].trim()}</div>
-            </div>
-        </div>
-        <div style="text-align:center; margin-bottom:30px;">
-            <div class="section-title">Kişilik Profili</div>
-            ${radarSVG}
-        </div>
-        <div class="ai-content">
-            <div class="section-title">Uzman Analiz Özeti</div>
-            <div class="ai-summary">${person.ai_summary}</div>
-            <div class="ai-grid">
-                <div class="ai-box"><h4>Güçlü Yönler</h4><ul>${(person.ai_strengths || []).map(s => `<li>${s}</li>`).join('')}</ul></div>
-                <div class="ai-box"><h4>Gelişim Alanları</h4><ul>${(person.ai_weaknesses || []).map(w => `<li>${w}</li>`).join('')}</ul></div>
-            </div>
-        </div>
-        <div style="font-size:10px; color:#94a3b8; text-align:center; margin-top:50px; border-top:1px solid #eee; padding-top:10px;">
-            Borsan Akademi Personel Analiz Sistemi &copy; ${new Date().getFullYear()}
-        </div>
-    </body>
-    </html>
-    `;
-    await page.setContent(htmlContent, { waitUntil: 'networkidle2', timeout: 45000 });
-    const pdfBuffer = await page.pdf({ format: 'A4', printBackground: true });
-    await browser.close();
-    return pdfBuffer;
-  } catch (error) {
-    if (browser) await browser.close();
-    throw error;
-  }
+  return new Promise((resolve, reject) => {
+    try {
+      const doc = new PDFDocument({ margin: 50, size: 'A4' });
+      const chunks = [];
+      doc.on('data', chunk => chunks.push(chunk));
+      doc.on('end', () => resolve(Buffer.concat(chunks)));
+
+      // Header
+      doc.fillColor('#e31e24').fontSize(24).font('Helvetica-Bold').text('BORSAN AKADEMİ', { align: 'left' });
+      doc.moveDown(0.2);
+      doc.fillColor('#1e293b').fontSize(14).font('Helvetica').text('Kişilik Envanteri Analiz Raporu', { align: 'left' });
+      doc.strokeColor('#e31e24').lineWidth(3).moveTo(50, 95).lineTo(545, 95).stroke();
+      doc.moveDown(2);
+
+      // Info Section
+      doc.fillColor('#1e293b').fontSize(16).font('Helvetica-Bold').text('Personel Bilgileri', 50, 120);
+      doc.moveDown(0.5);
+      doc.fontSize(11).font('Helvetica');
+      
+      const infoY = 145;
+      doc.text(`Ad Soyad:`, 50, infoY).font('Helvetica-Bold').text(person.name, 120, infoY).font('Helvetica');
+      doc.text(`Yaş:`, 50, infoY + 20).font('Helvetica-Bold').text(person.age.toString(), 120, infoY + 20).font('Helvetica');
+      doc.text(`Sicil No:`, 50, infoY + 40).font('Helvetica-Bold').text(person.employee_id || '—', 120, infoY + 40).font('Helvetica');
+      doc.text(`Departman:`, 50, infoY + 60).font('Helvetica-Bold').text(person.department || '—', 120, infoY + 60).font('Helvetica');
+      doc.text(`Pozisyon:`, 50, infoY + 80).font('Helvetica-Bold').text(person.position, 120, infoY + 80).font('Helvetica');
+
+      // Job Fit Card
+      doc.roundedRect(350, 140, 195, 80, 10).fill('#0f172a');
+      doc.fillColor('#ffffff').fontSize(10).text('Pozisyon Uygunluğu', 350, 155, { width: 195, align: 'center' });
+      doc.fontSize(32).font('Helvetica-Bold').text(`${person.ai_job_fit.match(/\d+/)?.[0] || '—'}%`, 350, 175, { width: 195, align: 'center' });
+
+      // Radar Chart
+      doc.moveDown(4);
+      doc.fillColor('#e31e24').fontSize(14).font('Helvetica-Bold').text('Kişilik Profili', 50, 260, { align: 'center' });
+      const svg = generateRadarSVG([person]);
+      SVGtoPDF(doc, svg, 145, 290, { width: 300, height: 300 });
+
+      // AI Analysis
+      doc.addPage();
+      doc.fillColor('#e31e24').fontSize(16).font('Helvetica-Bold').text('Uzman Analiz Özeti', 50, 50);
+      doc.moveDown(1);
+      doc.fillColor('#1e293b').fontSize(11).font('Helvetica').text(person.ai_summary, { align: 'justify', lineGap: 3 });
+      
+      doc.moveDown(2);
+      doc.fontSize(14).font('Helvetica-Bold').text('Güçlü Yönler', 50);
+      doc.moveDown(0.5);
+      (person.ai_strengths || []).forEach(s => {
+        doc.fontSize(11).font('Helvetica').text(`• ${s}`, { indent: 15 });
+      });
+
+      doc.moveDown(1.5);
+      doc.fontSize(14).font('Helvetica-Bold').text('Gelişim Alanları', 50);
+      doc.moveDown(0.5);
+      (person.ai_weaknesses || []).forEach(w => {
+        doc.fontSize(11).font('Helvetica').text(`• ${w}`, { indent: 15 });
+      });
+
+      // Footer
+      const pageCount = doc.bufferedPageRange().count;
+      for (let i = 0; i < pageCount; i++) {
+        doc.switchToPage(i);
+        doc.fillColor('#94a3b8').fontSize(10).text(`Borsan Akademi Envanter Analiz Sistemi © ${new Date().getFullYear()}`, 50, 780, { align: 'center' });
+      }
+
+      doc.end();
+    } catch (error) {
+      logger.error('PDFKit Generation Error:', error);
+      reject(error);
+    }
+  });
+}
+
+export async function generateComparisonPDF({ people, analysis, fitAnalysis, recommendation }) {
+  return new Promise((resolve, reject) => {
+    try {
+      const doc = new PDFDocument({ margin: 50, size: 'A4' });
+      const chunks = [];
+      doc.on('data', chunk => chunks.push(chunk));
+      doc.on('end', () => resolve(Buffer.concat(chunks)));
+
+      doc.fillColor('#e31e24').fontSize(24).font('Helvetica-Bold').text('BORSAN AKADEMİ', { align: 'left' });
+      doc.fillColor('#1e293b').fontSize(14).text('Personel Karşılaştırma Raporu', { align: 'left' });
+      doc.strokeColor('#e31e24').lineWidth(3).moveTo(50, 95).lineTo(545, 95).stroke();
+      doc.moveDown(2);
+
+      doc.fontSize(18).font('Helvetica-Bold').text('Seçilen Adaylar', 50);
+      doc.moveDown(1);
+      people.forEach((p, i) => {
+        doc.fontSize(12).font('Helvetica-Bold').text(`${i+1}. ${p.name}`, { continued: true });
+        doc.font('Helvetica').text(` - ${p.position} (${p.department || 'Genel'})`);
+      });
+
+      doc.moveDown(2);
+      doc.fontSize(16).font('Helvetica-Bold').text('Grup Karakteristiği', 50);
+      doc.moveDown(1);
+      
+      const svg = generateRadarSVG(people);
+      SVGtoPDF(doc, svg, 145, doc.y, { width: 300, height: 300 });
+
+      doc.end();
+    } catch (error) {
+      logger.error('Comparison PDF Generation Error:', error);
+      reject(error);
+    }
+  });
 }
