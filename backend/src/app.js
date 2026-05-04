@@ -40,8 +40,15 @@ app.use((req, _res, next) => {
   next();
 });
 
-app.use('/api', analyzeRouter);
-app.use('/api/admin', adminRouter);
+const apiRouter = express.Router();
+apiRouter.use('/admin', adminRouter);
+apiRouter.use('/', analyzeRouter);
+
+app.use('/api', apiRouter);
+app.use('/', (req, res, next) => {
+  if (req.url.startsWith('/api')) return next();
+  apiRouter(req, res, next);
+});
 
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
