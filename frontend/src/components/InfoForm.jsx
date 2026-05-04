@@ -74,7 +74,7 @@ export default function InfoForm({ onSubmit }) {
         <div className="logo-container">
           <img src="/logo.png" alt="Borsan Logo" className="main-logo" />
         </div>
-        <h1 className="modern-title">Envanter Analiz Sistemi</h1>
+        <h1 className="modern-title">Kişilik Envanter Testi Analizi</h1>
         <p className="modern-text">Borsan Akademi · Kişilik Değerlendirme</p>
 
         <form onSubmit={handleSubmit} noValidate>
