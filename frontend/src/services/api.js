@@ -67,28 +67,14 @@ export const adminApi = {
   },
   
   exportPDF: (ids) => {
-    return adminClient
-      .get('/export/pdf', { params: { ids: ids.join(',') }, responseType: 'blob' })
-      .then((r) => {
-        const url = URL.createObjectURL(r.data);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `karsilastirma-${Date.now()}.pdf`;
-        a.click();
-        URL.revokeObjectURL(url);
-      });
+    const token = localStorage.getItem('adminToken');
+    const url = `${API_BASE_URL}/api/admin/export/pdf?ids=${ids.join(',')}&token=${token}`;
+    window.location.href = url;
   },
-
+  
   exportSinglePDF: (id) => {
-    return adminClient
-      .get(`/personnel/${id}/pdf`, { responseType: 'blob' })
-      .then((r) => {
-        const url = URL.createObjectURL(r.data);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `personel-raporu-${id}.pdf`;
-        a.click();
-        URL.revokeObjectURL(url);
-      });
+    const token = localStorage.getItem('adminToken');
+    const url = `${API_BASE_URL}/api/admin/personnel/${id}/pdf?token=${token}`;
+    window.location.href = url;
   },
 };
