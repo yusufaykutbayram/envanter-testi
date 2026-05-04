@@ -19,8 +19,16 @@
       "destination": "backend/src/app.js"
     },
     {
-      "source": "/(.*)",
-      "destination": "frontend/$1"
+      "source": "/reports/(.*)",
+      "destination": "backend/reports/$1"
+    },
+    {
+      "source": "/admin/(.*)",
+      "destination": "/frontend/index.html"
+    },
+    {
+      "source": "/((?!api/|reports/).*)",
+      "destination": "/frontend/index.html"
     }
   ],
   "env": {

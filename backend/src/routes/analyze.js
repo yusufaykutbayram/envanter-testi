@@ -44,12 +44,15 @@ router.post('/analyze', async (req, res, next) => {
       ai_stress_behavior: aiAnalysis.stress_behavior || '',
       ai_job_fit: `${suitability.label} (%${suitability.score})`,
       ai_recommendations: aiAnalysis.recommendations || []
-    }).select().single();
+    }).select(); // Removed .single() to avoid failure if multiple rows (unlikely but safer)
 
-    if (error) throw error;
+    if (error) {
+      logger.error('Supabase Insert Error:', error);
+      throw error;
+    }
 
     res.json({
-      id: result.id,
+      id: result?.[0]?.id || null,
       scores,
       backendPosition: position,
       aiAnalysis,
