@@ -30,7 +30,7 @@ export default function PersonnelDetail() {
           {p.name}
         </h1>
         <div className="header-actions">
-          <button className="btn btn-primary" onClick={handleExportPDF}>📄 PDF Rapor İndir</button>
+          <button className="btn btn-primary" onClick={handleDownloadPDF}>📄 PDF Rapor İndir</button>
           <div className="badge badge-lg">{p.position}</div>
         </div>
       </div>
