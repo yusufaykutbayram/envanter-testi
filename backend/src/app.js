@@ -17,8 +17,12 @@ app.set('trust proxy', 1); // Required for rate limiting behind Vercel proxy
 app.use(helmet());
 
 // CORS Configuration
+const allowedOrigins = process.env.FRONTEND_URL
+  ? [process.env.FRONTEND_URL]
+  : true; // Allow all origins in development/unset environments
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin: allowedOrigins,
   credentials: true,
 }));
 
