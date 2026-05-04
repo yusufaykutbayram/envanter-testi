@@ -4,14 +4,16 @@ import logger from '../utils/logger.js';
 
 async function getBrowser() {
   if (process.env.VERCEL) {
+    logger.info('Launching browser on Vercel...');
     return await puppeteer.launch({
-      args: chromium.args,
+      args: [...chromium.args, '--no-sandbox', '--disable-setuid-sandbox'],
       defaultViewport: chromium.defaultViewport,
       executablePath: await chromium.executablePath(),
       headless: chromium.headless,
       ignoreHTTPSErrors: true,
     });
   }
+  logger.info('Launching browser locally...');
   return await puppeteer.launch({
     headless: 'new',
     args: ['--no-sandbox', '--disable-setuid-sandbox'],
@@ -180,7 +182,7 @@ export async function generateComparisonPDF(data) {
     </body>
     </html>
     `;
-    await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
+    await page.setContent(htmlContent, { waitUntil: 'networkidle2', timeout: 45000 });
     const pdfBuffer = await page.pdf({ format: 'A4', printBackground: true });
     await browser.close();
     return pdfBuffer;
@@ -255,7 +257,7 @@ export async function generatePersonnelReportPDF(person) {
     </body>
     </html>
     `;
-    await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
+    await page.setContent(htmlContent, { waitUntil: 'networkidle2', timeout: 45000 });
     const pdfBuffer = await page.pdf({ format: 'A4', printBackground: true });
     await browser.close();
     return pdfBuffer;

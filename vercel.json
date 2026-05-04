@@ -27,6 +27,12 @@
       "destination": "/index.html"
     }
   ],
+  "functions": {
+    "backend/src/app.js": {
+      "memory": 1024,
+      "maxDuration": 60
+    }
+  },
   "env": {
     "VERCEL": "1"
   }

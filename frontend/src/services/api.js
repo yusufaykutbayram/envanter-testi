@@ -10,7 +10,7 @@ const apiClient = axios.create({
 
 const adminClient = axios.create({
   baseURL: `${API_BASE_URL}/api/admin`,
-  timeout: 15000,
+  timeout: 60000,
   headers: { 'Content-Type': 'application/json' },
 });
 
