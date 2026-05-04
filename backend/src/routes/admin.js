@@ -122,11 +122,14 @@ router.get('/personnel/:id/pdf', requireAdmin, async (req, res) => {
 
     const pdfBuffer = await generatePersonnelReportPDF(person);
     
-    res.type('pdf');
-    res.set('Content-Disposition', `attachment; filename=rapor-${person.id}.pdf`);
-    res.send(Buffer.from(pdfBuffer));
+    res.writeHead(200, {
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `attachment; filename=rapor-${person.id}.pdf`,
+      'Content-Length': pdfBuffer.length
+    });
+    res.end(pdfBuffer);
   } catch (error) {
-    logger.error(error);
+    logger.error('Single PDF Error:', error);
     if (!res.headersSent) {
       res.status(500).json({ error: 'PDF oluşturulamadı' });
     }
@@ -219,12 +222,48 @@ router.get('/export/pdf', requireAdmin, async (req, res) => {
     const ids = req.query.ids?.split(',').map(Number) || [];
     const { data: people } = await db.from('personnel').select('*').in('id', ids);
 
-    const pdfBuffer = await generateComparisonPDF({ people, analysis, fitAnalysis, recommendation: { winnerName: 'Seçilenler', reason: '...' } });
+    // Re-calculate analysis and fitAnalysis to avoid ReferenceErrors
+    const traits = [
+      { code: 'E', key: 'e_score' },
+      { code: 'A', key: 'a_score' },
+      { code: 'C', key: 'c_score' },
+      { code: 'N', key: 'n_score' },
+      { code: 'O', key: 'o_score' }
+    ];
+
+    const analysis = traits.map(trait => {
+      const scores = people.map(p => p[trait.key]);
+      const min = Math.min(...scores);
+      const max = Math.max(...scores);
+      const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
+      let type = 'balanced';
+      if (max - min > 30) type = 'opposite';
+      else if (avg > 70) type = 'similar_high';
+      else if (avg < 30) type = 'similar_low';
+      return { trait: trait.code, type, ...COMPARISON_TEMPLATES[trait.code][type] };
+    });
+
+    const fitAnalysis = people.map(p => {
+      const scores = { E: p.e_score, A: p.a_score, C: p.c_score, N: p.n_score, O: p.o_score };
+      const suitability = calculateSuitability(scores, p.position, p.department);
+      return { id: p.id, name: p.name, fitScore: suitability.score, label: suitability.label };
+    });
+
+    const pdfBuffer = await generateComparisonPDF({ 
+      people, 
+      analysis, 
+      fitAnalysis, 
+      recommendation: { winnerName: 'Seçilenler', reason: 'Analiz tamamlandı.' } 
+    });
     
-    res.type('pdf');
-    res.set('Content-Disposition', 'attachment; filename=karsilastirma.pdf');
-    res.send(Buffer.from(pdfBuffer));
+    res.writeHead(200, {
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': 'attachment; filename=karsilastirma.pdf',
+      'Content-Length': pdfBuffer.length
+    });
+    res.end(pdfBuffer);
   } catch (error) {
+    logger.error('Export PDF Error:', error);
     if (!res.headersSent) {
       res.status(500).json({ error: 'PDF oluşturulamadı' });
     }
