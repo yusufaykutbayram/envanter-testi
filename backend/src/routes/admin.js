@@ -122,12 +122,17 @@ router.get('/personnel/:id/pdf', requireAdmin, async (req, res) => {
 
     const pdfBuffer = await generatePersonnelReportPDF(person);
     
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename=rapor-${person.id}.pdf`);
-    res.send(Buffer.from(pdfBuffer));
+    res.writeHead(200, {
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `attachment; filename=rapor-${person.id}.pdf`,
+      'Content-Length': pdfBuffer.length
+    });
+    res.end(Buffer.from(pdfBuffer));
   } catch (error) {
     logger.error(error);
-    res.status(500).json({ error: 'PDF oluşturulamadı' });
+    if (!res.headersSent) {
+        res.status(500).json({ error: 'PDF oluşturulamadı' });
+    }
   }
 });
 
@@ -217,14 +222,18 @@ router.get('/export/pdf', requireAdmin, async (req, res) => {
     const ids = req.query.ids?.split(',').map(Number) || [];
     const { data: people } = await db.from('personnel').select('*').in('id', ids);
 
-    // Reuse logic from /compare (Note: In a full app, this should be refactored)
-    const pdfBuffer = await generateComparisonPDF({ people, analysis: [], fitAnalysis: [], recommendation: { winnerName: 'Seçilenler', reason: '...' } });
+    const pdfBuffer = await generateComparisonPDF({ people, analysis, fitAnalysis, recommendation: { winnerName: 'Seçilenler', reason: '...' } });
     
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', 'attachment; filename=karsilastirma.pdf');
-    res.send(Buffer.from(pdfBuffer));
+    res.writeHead(200, {
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': 'attachment; filename=karsilastirma.pdf',
+      'Content-Length': pdfBuffer.length
+    });
+    res.end(Buffer.from(pdfBuffer));
   } catch (error) {
-    res.status(500).json({ error: 'PDF oluşturulamadı' });
+    if (!res.headersSent) {
+      res.status(500).json({ error: 'PDF oluşturulamadı' });
+    }
   }
 });
 
