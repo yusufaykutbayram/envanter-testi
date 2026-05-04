@@ -9,6 +9,10 @@ const FACTOR_RANGES = {
 };
 
 const POSITION_MATRIX = {
+  "Görevli": {
+    min: { C: 60, N: 55, A: 50, O: 50 },
+    weight: { C: 0.40, N: 0.30, A: 0.15, E: 0.10, O: 0.05 }
+  },
   "Operatör Yardımcısı": {
     min: { C: 60, N: 55, A: 50, O: 50 },
     weight: { C: 0.40, N: 0.30, A: 0.15, E: 0.10, O: 0.05 }
@@ -16,6 +20,18 @@ const POSITION_MATRIX = {
   "Operatör": {
     min: { C: 70, N: 60, A: 55, O: 55 },
     weight: { C: 0.45, N: 0.30, A: 0.15, E: 0.05, O: 0.05 }
+  },
+  "Teknisyen Yardımcısı": {
+    min: { C: 65, N: 60, A: 55, O: 55 },
+    weight: { C: 0.40, N: 0.30, A: 0.15, E: 0.10, O: 0.05 }
+  },
+  "Teknisyen": {
+    min: { C: 70, N: 65, A: 60, O: 60 },
+    weight: { C: 0.45, N: 0.30, A: 0.15, E: 0.05, O: 0.05 }
+  },
+  "Tekniker": {
+    min: { C: 75, N: 65, A: 60, E: 55, O: 60 },
+    weight: { C: 0.35, N: 0.25, A: 0.15, E: 0.15, O: 0.10 }
   },
   "Lider": {
     min: { C: 75, N: 65, A: 65, E: 60, O: 60 },
@@ -25,13 +41,29 @@ const POSITION_MATRIX = {
     min: { C: 80, N: 70, A: 70, E: 65, O: 60 },
     weight: { C: 0.30, E: 0.25, N: 0.20, A: 0.15, O: 0.10 }
   },
-  "Üretim Mühendisi": {
-    min: { C: 75, N: 65, O: 70, A: 60, E: 55 },
-    weight: { C: 0.30, O: 0.30, N: 0.15, A: 0.15, E: 0.10 }
-  },
-  "Vardiya Mühendisi": {
+  "Mühendis": {
     min: { C: 80, N: 70, E: 60, A: 65, O: 65 },
     weight: { C: 0.30, N: 0.25, E: 0.20, A: 0.15, O: 0.10 }
+  },
+  "Kıdemli Mühendis": {
+    min: { C: 85, N: 75, E: 65, A: 70, O: 70 },
+    weight: { C: 0.30, N: 0.20, E: 0.20, A: 0.15, O: 0.15 }
+  },
+  "Uzman Yardımcısı(Saha)": {
+    min: { C: 65, N: 60, O: 65, A: 55, E: 50 },
+    weight: { C: 0.30, O: 0.25, N: 0.20, A: 0.15, E: 0.10 }
+  },
+  "Uzman(Saha)": {
+    min: { C: 70, N: 65, O: 70, A: 60, E: 55 },
+    weight: { C: 0.30, O: 0.30, N: 0.15, A: 0.15, E: 0.10 }
+  },
+  "Uzman Yardımcısı(Ofis)": {
+    min: { C: 65, N: 60, O: 65, A: 55, E: 50 },
+    weight: { C: 0.30, O: 0.25, N: 0.20, A: 0.15, E: 0.10 }
+  },
+  "Uzman(Ofis)": {
+    min: { C: 70, N: 65, O: 70, A: 60, E: 55 },
+    weight: { C: 0.30, O: 0.30, N: 0.15, A: 0.15, E: 0.10 }
   },
   "Uzman Yardımcısı": {
     min: { C: 65, N: 60, O: 65, A: 55, E: 50 },

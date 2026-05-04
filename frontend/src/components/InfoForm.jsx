@@ -1,12 +1,20 @@
 import { useState } from 'react';
 
 const POSITIONS = [
+  "Görevli",
   "Operatör Yardımcısı",
   "Operatör",
+  "Teknisyen Yardımcısı",
+  "Teknisyen",
+  "Tekniker",
   "Lider",
   "Vardiya Amiri",
-  "Üretim Mühendisi",
-  "Vardiya Mühendisi",
+  "Mühendis",
+  "Kıdemli Mühendis",
+  "Uzman Yardımcısı(Saha)",
+  "Uzman(Saha)",
+  "Uzman Yardımcısı(Ofis)",
+  "Uzman(Ofis)",
   "Uzman Yardımcısı",
   "Uzman",
   "Kıdemli Uzman",
