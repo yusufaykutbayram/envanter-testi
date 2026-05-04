@@ -68,13 +68,13 @@ export const adminApi = {
   
   exportPDF: (ids) => {
     const token = localStorage.getItem('adminToken');
-    const url = `${API_BASE_URL}/api/admin/export/pdf?ids=${ids.join(',')}&token=${token}`;
-    window.location.href = url;
+    const url = `${API_BASE_URL}/api/admin/export/pdf?ids=${ids.join(',')}&token=${token}&v=${Date.now()}`;
+    window.open(url, '_blank');
   },
   
   exportSinglePDF: (id) => {
     const token = localStorage.getItem('adminToken');
-    const url = `${API_BASE_URL}/api/admin/personnel/${id}/pdf?token=${token}`;
-    window.location.href = url;
+    const url = `${API_BASE_URL}/api/admin/personnel/${id}/pdf?token=${token}&v=${Date.now()}`;
+    window.open(url, '_blank');
   },
 };

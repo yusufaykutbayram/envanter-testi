@@ -205,13 +205,12 @@ export async function generatePersonnelReportPDF(person) {
     <head>
         <meta charset="UTF-8">
         <style>
-            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-            body { font-family: 'Inter', sans-serif; color: #1e293b; margin: 0; padding: 40px; background: #fff; }
+            body { font-family: Arial, sans-serif; color: #1e293b; margin: 0; padding: 40px; background: #fff; }
             .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #e31e24; padding-bottom: 20px; margin-bottom: 30px; }
             .logo { font-weight: 800; font-size: 24px; color: #e31e24; }
             .main-grid { display: flex; gap: 30px; margin-bottom: 30px; }
             .info-panel { flex: 1; background: #f8fafc; border-radius: 16px; padding: 24px; border: 1px solid #e2e8f0; }
-            .suitability-card { flex: 1; background: linear-gradient(135deg, #0f172a 0%, #334155 100%); color: white; border-radius: 16px; padding: 24px; text-align: center; }
+            .suitability-card { flex: 1; background: #0f172a; color: white; border-radius: 16px; padding: 24px; text-align: center; }
             .suit-score { font-size: 48px; font-weight: 800; }
             .section-title { font-size: 16px; font-weight: 800; color: #e31e24; text-transform: uppercase; margin-bottom: 15px; }
             .info-item { display: flex; justify-content: space-between; border-bottom: 1px dashed #cbd5e1; padding-bottom: 5px; margin-bottom: 10px; }
