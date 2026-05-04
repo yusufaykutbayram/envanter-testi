@@ -8,6 +8,7 @@
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
   },
   "dependencies": {
+    "@fontsource/roboto": "^5.2.10",
     "@google/generative-ai": "^0.24.1",
     "@supabase/supabase-js": "^2.105.1",
     "bcryptjs": "^2.4.3",
