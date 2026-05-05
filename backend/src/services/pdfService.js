@@ -246,11 +246,18 @@ export async function generateComparisonPDF({ people, analysis, fitAnalysis, rec
       y = 110;
 
       if (recommendation) {
-        doc.fillColor('#f0fdf4').roundedRect(50, y, 495, 60, 8).fill();
+        const reason = safeStr(recommendation.reason);
+        const reasonHeight = doc.heightOfString(reason, { width: 465 });
+        const boxHeight = reasonHeight + 50; // padding + title spaces
+
+        doc.fillColor('#f0fdf4').roundedRect(50, y, 495, boxHeight, 8).fill();
+        doc.fillColor('#16a34a').rect(50, y, 5, boxHeight).fill();
+        
         bold(doc).fillColor('#16a34a').fontSize(11).text('Uzman Onerisi:', 65, y + 12);
-        bold(doc).fillColor(COLORS.dark).fontSize(11).text(recommendation.winnerName, 65, y + 28);
-        reg(doc).fillColor(COLORS.text).fontSize(9).text(recommendation.reason, 65, y + 43, { width: 465 });
-        y += 80;
+        bold(doc).fillColor(COLORS.dark).fontSize(11).text(safeStr(recommendation.winnerName), 65, y + 28);
+        reg(doc).fillColor(COLORS.text).fontSize(9).text(reason, 65, y + 43, { width: 465 });
+        
+        y += boxHeight + 15;
       }
 
       if (fitAnalysis && fitAnalysis.length) {

@@ -249,11 +249,20 @@ router.get('/export/pdf', requireAdmin, async (req, res) => {
       return { id: p.id, name: p.name, fitScore: suitability.score, label: suitability.label };
     });
 
+    const winner = [...fitAnalysis].sort((a, b) => b.fitScore - a.fitScore)[0];
+    const recommendation = {
+      winnerId: winner?.id,
+      winnerName: winner?.name || 'Belirlenemedi',
+      reason: winner 
+        ? `${winner.name}, %${winner.fitScore} uyum oranı ile bu pozisyon için en yüksek potansiyeli sergileyen adaydır. Kişilik profili departman gereklilikleri ile optimum düzeyde örtüşmektedir.`
+        : 'Analiz tamamlandı ancak net bir aday belirlenemedi.'
+    };
+
     const pdfBuffer = await generateComparisonPDF({ 
       people, 
       analysis, 
       fitAnalysis, 
-      recommendation: { winnerName: 'Seçilenler', reason: 'Analiz tamamlandı.' } 
+      recommendation 
     });
     
     res.writeHead(200, {
