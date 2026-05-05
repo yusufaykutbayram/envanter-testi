@@ -12,6 +12,18 @@ const __dirname = dirname(__filename);
 let fontRegular = null;
 let fontBold = null;
 
+// jsDelivr fontsource TTF subset URL'leri (latin-ext = Türkçe dahil)
+const FONT_URLS = {
+  regular: 'https://cdn.jsdelivr.net/fontsource/fonts/roboto@latest/latin-ext-400-normal.ttf',
+  bold:    'https://cdn.jsdelivr.net/fontsource/fonts/roboto@latest/latin-ext-700-normal.ttf',
+};
+
+async function fetchBuffer(url) {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`HTTP ${res.status}: ${url}`);
+  return Buffer.from(await res.arrayBuffer());
+}
+
 async function loadFonts() {
   if (fontRegular && fontBold) return;
   try {
@@ -20,22 +32,18 @@ async function loadFonts() {
     if (existsSync(localReg) && existsSync(localBold)) {
       fontRegular = readFileSync(localReg);
       fontBold = readFileSync(localBold);
-      logger.info('Fonts loaded from local files');
+      logger.info('Fonts loaded from local files (Turkish charset ready)');
       return;
     }
-    const [r1, r2] = await Promise.all([
-      fetch('https://github.com/google/fonts/raw/refs/heads/main/apache/roboto/static/Roboto-Regular.ttf'),
-      fetch('https://github.com/google/fonts/raw/refs/heads/main/apache/roboto/static/Roboto-Bold.ttf'),
+    // Yerel dosya yoksa jsDelivr'dan çek (Türkçe latin-ext subset)
+    logger.info('Local fonts not found, fetching from jsDelivr CDN...');
+    [fontRegular, fontBold] = await Promise.all([
+      fetchBuffer(FONT_URLS.regular),
+      fetchBuffer(FONT_URLS.bold),
     ]);
-    if (r1.ok && r2.ok) {
-      fontRegular = Buffer.from(await r1.arrayBuffer());
-      fontBold = Buffer.from(await r2.arrayBuffer());
-      logger.info('Fonts loaded from CDN');
-    } else {
-      throw new Error('CDN response not ok');
-    }
+    logger.info('Fonts loaded from jsDelivr CDN (Turkish charset ready)');
   } catch (err) {
-    logger.warn('Roboto font unavailable, using Helvetica: ' + err.message);
+    logger.warn('Roboto font unavailable, falling back to Helvetica (Turkish chars may break): ' + err.message);
     fontRegular = null;
     fontBold = null;
   }
