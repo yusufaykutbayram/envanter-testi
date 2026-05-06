@@ -15,8 +15,6 @@ const POSITIONS = [
   "Uzman(Saha)",
   "Uzman Yardımcısı(Ofis)",
   "Uzman(Ofis)",
-  "Uzman Yardımcısı",
-  "Uzman",
   "Kıdemli Uzman",
   "Yönetici",
   "Müdür"

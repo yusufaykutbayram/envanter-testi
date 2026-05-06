@@ -65,14 +65,6 @@ const POSITION_MATRIX = {
     min: { C: 70, N: 65, O: 70, A: 60, E: 55 },
     weight: { C: 0.30, O: 0.30, N: 0.15, A: 0.15, E: 0.10 }
   },
-  "Uzman Yardımcısı": {
-    min: { C: 65, N: 60, O: 65, A: 55, E: 50 },
-    weight: { C: 0.30, O: 0.25, N: 0.20, A: 0.15, E: 0.10 }
-  },
-  "Uzman": {
-    min: { C: 70, N: 65, O: 70, A: 60, E: 55 },
-    weight: { C: 0.30, O: 0.30, N: 0.15, A: 0.15, E: 0.10 }
-  },
   "Kıdemli Uzman": {
     min: { C: 75, N: 70, O: 75, A: 65, E: 60 },
     weight: { C: 0.30, O: 0.30, N: 0.20, A: 0.10, E: 0.10 }
