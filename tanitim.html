@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Borsan Akademi - Tanıtım Broşürü</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+        
+        :root {
+            --primary: #E31E24;
+            --slate: #334155;
+            --light: #F8FAFC;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #cbd5e1;
+            color: var(--slate);
+        }
+
+        .page {
+            width: 210mm;
+            height: 297mm;
+            padding: 20mm;
+            margin: 10mm auto;
+            background: white;
+            box-shadow: 0 0 40px rgba(0,0,0,0.2);
+            box-sizing: border-box;
+            overflow: hidden;
+            position: relative;
+            page-break-after: always;
+        }
+
+        header {
+            border-left: 8px solid var(--primary);
+            padding-left: 20px;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 900;
+            margin: 0;
+            color: #0f172a;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+        }
+
+        .subtitle {
+            font-size: 18px;
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .post-container {
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .post-image {
+            width: 100%;
+            height: 175mm;
+            object-fit: cover;
+            border-radius: 16px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+            background: #f1f5f9;
+        }
+
+        .details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            position: absolute;
+            bottom: 25mm;
+            left: 20mm;
+            right: 20mm;
+        }
+
+        .detail-box {
+            background: rgba(248, 250, 252, 0.8);
+            backdrop-filter: blur(8px);
+            padding: 25px;
+            border-radius: 16px;
+            border: 1px solid rgba(0,0,0,0.05);
+            border-top: 5px solid var(--primary);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .detail-box h3 {
+            margin-top: 0;
+            font-size: 17px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            color: var(--primary);
+            font-weight: 800;
+        }
+
+        .detail-box p {
+            margin: 0;
+            font-size: 14.5px;
+            line-height: 1.6;
+            color: #334155;
+        }
+
+        .footer {
+            position: absolute;
+            bottom: 10mm;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 12px;
+            color: #94a3b8;
+            border-top: 1px solid #f1f5f9;
+            padding-top: 15px;
+            font-weight: 600;
+        }
+
+        @media print {
+            body { background: white; margin: 0; }
+            .page { margin: 0; box-shadow: none; border: none; }
+            .no-print { display: none; }
+        }
+
+        .btn-print {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--primary);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 40px;
+            text-decoration: none;
+            font-weight: 800;
+            box-shadow: 0 10px 25px rgba(227, 30, 36, 0.4);
+            cursor: pointer;
+            border: none;
+            z-index: 1000;
+            transition: transform 0.2s;
+        }
+        .btn-print:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+
+    <button class="btn-print no-print" onclick="window.print()">PROFESYONEL PDF OLARAK KAYDET</button>
+
+    <!-- SAYFA 1: ULTRA-MODERN ANA TANITIM -->
+    <div class="page">
+        <header>
+            <h1>Borsan Akademi</h1>
+            <div class="subtitle">Yapay Zeka Destekli Kişilik Envanter Analizi</div>
+        </header>
+
+        <div class="post-container">
+            <img src="frontend/public/assets/promo/post1.png" alt="Yapay Zeka Analizi" class="post-image">
+        </div>
+
+        <div class="details">
+            <div class="detail-box">
+                <h3>🚀 AI Analiz Motoru</h3>
+                <p>Adayların cevap örüntülerini analiz eden ve %98 doğrulukla davranışsal yetkinlik haritası çıkaran özel AI algoritması.</p>
+            </div>
+            <div class="detail-box">
+                <h3>🧠 Bilimsel Metodoloji</h3>
+                <p>Uluslararası standartlarda Big Five envanterini modern psikometri teknikleriyle birleştiren güvenilir altyapı.</p>
+            </div>
+        </div>
+        <div class="footer">Borsan Grup - Borsan Akademi | Sayfa 1</div>
+    </div>
+
+    <!-- SAYFA 2: ULTRA-MODERN POZİSYON ÖZEL -->
+    <div class="page">
+        <header>
+            <h1>Borsan Akademi</h1>
+            <div class="subtitle">Hassas Pozisyon Uyumluluğu</div>
+        </header>
+
+        <div class="post-container">
+            <img src="frontend/public/assets/promo/post2.png" alt="Saha & Ofis" class="post-image">
+        </div>
+
+        <div class="details">
+            <div class="detail-box">
+                <h3>🛠️ Saha & Operasyon</h3>
+                <p>Teknik roller ve saha personeli için özel olarak kurgulanmış, uygulama odaklı yetkinlik ölçümleme sistemi.</p>
+            </div>
+            <div class="detail-box">
+                <h3>💼 Ofis & Yönetim</h3>
+                <p>Stratejik düşünme, liderlik ve kurumsal uyum odaklı değerlendirme setleriyle doğru adayı belirleme gücü.</p>
+            </div>
+        </div>
+        <div class="footer">Borsan Grup - Borsan Akademi | Sayfa 2</div>
+    </div>
+
+    <!-- SAYFA 3: ULTRA-MODERN RAPORLAMA -->
+    <div class="page">
+        <header>
+            <h1>Borsan Akademi</h1>
+            <div class="subtitle">Stratejik Karar Destek Sistemi</div>
+        </header>
+
+        <div class="post-container">
+            <img src="frontend/public/assets/promo/post3.png" alt="Dashboard ve Analiz" class="post-image">
+        </div>
+
+        <div class="details">
+            <div class="detail-box">
+                <h3>📊 Akıllı Dashboard</h3>
+                <p>Gerçek zamanlı istatistikler ve görsel grafiklerle tüm test süreçlerini tek bir merkezden yönetin.</p>
+            </div>
+            <div class="detail-box">
+                <h3>📄 Anlık Raporlama</h3>
+                <p>Aday bazlı, yapay zeka yorumlu profesyonel raporlarınızı anında oluşturun ve stratejik kararlar alın.</p>
+            </div>
+        </div>
+        <div class="footer">Borsan Grup - Borsan Akademi | Sayfa 3</div>
+    </div>
+
+</body>
+</html>
