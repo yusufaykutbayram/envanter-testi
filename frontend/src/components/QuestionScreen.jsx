@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
-import { questions, likertScale } from '../data/questions';
+import { likertScale } from '../data/questions';
 import ProgressBar from './ProgressBar';
 
-export default function QuestionScreen({ onComplete }) {
+export default function QuestionScreen({ questions, onComplete }) {
   const [index,    setIndex]    = useState(0);
   const [answers,  setAnswers]  = useState({});
   const [selected, setSelected] = useState(null);

@@ -3,6 +3,7 @@ import { useState } from 'react';
 import InfoForm        from './components/InfoForm';
 import QuestionScreen  from './components/QuestionScreen';
 import LoadingScreen   from './components/LoadingScreen';
+import SuccessScreen   from './components/SuccessScreen';
 import ResultScreen    from './components/ResultScreen';
 import { submitTest }  from './services/api';
 import AdminLogin      from './pages/AdminLogin';
@@ -11,9 +12,22 @@ import Dashboard       from './pages/Dashboard';
 import PersonnelList   from './pages/PersonnelList';
 import PersonnelDetail from './pages/PersonnelDetail';
 import PersonnelCompare from './pages/PersonnelCompare';
-import SuccessScreen   from './components/SuccessScreen';
+import { genericQuestions, sahaQuestions } from './data/questions';
 
 const STEPS = { INFO: 'info', TEST: 'test', LOADING: 'loading', RESULT: 'result', ERROR: 'error' };
+
+const SAHA_POSITIONS = [
+  "Görevli",
+  "Operatör Yardımcısı",
+  "Operatör",
+  "Teknisyen Yardımcısı",
+  "Teknisyen",
+  "Tekniker",
+  "Lider",
+  "Vardiya Amiri",
+  "Uzman Yardımcısı(Saha)",
+  "Uzman(Saha)"
+];
 
 function TestFlow() {
   const [step,     setStep]     = useState(STEPS.INFO);
@@ -21,7 +35,14 @@ function TestFlow() {
   const [results,  setResults]  = useState(null);
   const [error,    setError]    = useState(null);
 
-  const handleInfoSubmit = (info) => { setUserInfo(info); setStep(STEPS.TEST); };
+  const handleInfoSubmit = (info) => { 
+    setUserInfo(info); 
+    setStep(STEPS.TEST); 
+  };
+
+  const activeQuestions = (userInfo && SAHA_POSITIONS.includes(userInfo.position))
+    ? sahaQuestions
+    : genericQuestions;
 
   const handleTestComplete = async (answers) => {
     setStep(STEPS.LOADING);
@@ -43,7 +64,7 @@ function TestFlow() {
   const handleRestart = () => { setStep(STEPS.INFO); setResults(null); setError(null); };
 
   if (step === STEPS.INFO)    return <InfoForm onSubmit={handleInfoSubmit} />;
-  if (step === STEPS.TEST)    return <QuestionScreen onComplete={handleTestComplete} />;
+  if (step === STEPS.TEST)    return <QuestionScreen questions={activeQuestions} onComplete={handleTestComplete} />;
   if (step === STEPS.LOADING) return <LoadingScreen />;
   if (step === STEPS.RESULT)  return <SuccessScreen onRestart={handleRestart} />;
 
