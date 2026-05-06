@@ -131,7 +131,7 @@ export default function PersonnelList() {
                   <th>Departman</th>
                   <th>Tarih</th>
                   <th>AI Özeti</th>
-                  <th></th>
+                  <th className="td-actions"></th>
                 </tr>
               </thead>
               <tbody>
@@ -162,17 +162,18 @@ export default function PersonnelList() {
                     <td className="td-summary">
                       {p.ai_summary ? p.ai_summary.substring(0, 70) + '…' : '—'}
                     </td>
-                    <td>
-                      <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <td className="td-actions">
+                      <div style={{ display: 'flex', gap: '0.4rem', justifyContent: 'flex-end' }}>
                         <button
                           className="btn btn-sm"
+                          style={{ padding: '0.4rem 0.8rem', fontSize: '0.75rem' }}
                           onClick={() => navigate(`/admin/personnel/${p.id}`)}
                         >
                           Detay
                         </button>
                         <button
                           className="btn btn-sm btn-ghost"
-                          style={{ color: '#ef4444' }}
+                          style={{ color: '#ef4444', padding: '0.4rem 0.8rem', fontSize: '0.75rem' }}
                           onClick={(e) => {
                             e.stopPropagation();
                             if (window.confirm(`${p.name} kaydını silmek istediğinize emin misiniz?`)) {
