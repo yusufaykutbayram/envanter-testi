@@ -27,6 +27,12 @@ export default function AdminLayout() {
           >
             👥 Personel Listesi
           </NavLink>
+          <NavLink
+            to="/admin/settings"
+            className={({ isActive }) => `nav-item${isActive ? ' active' : ''}`}
+          >
+            ⚙️ Ayarlar
+          </NavLink>
         </nav>
         <button className="btn btn-ghost sidebar-logout" onClick={handleLogout}>
           🚪 Çıkış Yap

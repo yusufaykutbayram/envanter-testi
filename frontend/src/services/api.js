@@ -77,4 +77,10 @@ export const adminApi = {
     const url = `${API_BASE_URL}/api/admin/personnel/${id}/pdf?token=${token}&v=${Date.now()}`;
     window.open(url, '_blank');
   },
+
+  deletePersonnel: (id) =>
+    adminClient.delete(`/personnel/${id}`).then((r) => r.data),
+
+  changePassword: (newPassword) =>
+    adminClient.post('/change-password', { newPassword }).then((r) => r.data),
 };

@@ -12,6 +12,7 @@ import Dashboard       from './pages/Dashboard';
 import PersonnelList   from './pages/PersonnelList';
 import PersonnelDetail from './pages/PersonnelDetail';
 import PersonnelCompare from './pages/PersonnelCompare';
+import AdminSettings from './pages/AdminSettings';
 import { genericQuestions, sahaQuestions } from './data/questions';
 
 const STEPS = { INFO: 'info', TEST: 'test', LOADING: 'loading', RESULT: 'result', ERROR: 'error' };
@@ -100,6 +101,7 @@ export default function App() {
         <Route path="personnel"       element={<PersonnelList />} />
         <Route path="personnel/:id"   element={<PersonnelDetail />} />
         <Route path="compare"         element={<PersonnelCompare />} />
+        <Route path="settings"        element={<AdminSettings />} />
       </Route>
     </Routes>
   );

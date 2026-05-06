@@ -20,10 +20,19 @@ const loginLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-router.post('/login', loginLimiter, (req, res) => {
+router.post('/login', loginLimiter, async (req, res) => {
   const { username, password } = req.body;
+  
+  // Önce veritabanında özel şifre var mı kontrol et
+  let adminPass = process.env.ADMIN_PASSWORD || 'admin123';
+  try {
+    const { data: customPass } = await db.from('admin_settings').select('value').eq('key', 'admin_password').single();
+    if (customPass) adminPass = customPass.value;
+  } catch (e) {
+    // Tablo yoksa veya hata oluşursa .env şifresine devam et
+  }
+
   const adminUser = process.env.ADMIN_USERNAME || 'admin';
-  const adminPass = process.env.ADMIN_PASSWORD || 'admin123';
 
   if (!username || !password || username !== adminUser || password !== adminPass) {
     return res.status(401).json({ error: 'Kullanıcı adı veya şifre hatalı' });
@@ -35,6 +44,27 @@ router.post('/login', loginLimiter, (req, res) => {
     { expiresIn: '8h' }
   );
   res.json({ token });
+});
+
+router.post('/change-password', requireAdmin, async (req, res) => {
+  const { newPassword } = req.body;
+  if (!newPassword || newPassword.length < 4) {
+    return res.status(400).json({ error: 'Şifre en az 4 karakter olmalıdır' });
+  }
+
+  try {
+    const { error } = await db.from('admin_settings').upsert({
+      key: 'admin_password',
+      value: newPassword,
+      updated_at: new Date().toISOString()
+    }, { onConflict: 'key' });
+
+    if (error) throw error;
+    res.json({ success: true, message: 'Şifre başarıyla güncellendi' });
+  } catch (error) {
+    logger.error('Change Password Error:', error);
+    res.status(500).json({ error: 'Şifre güncellenemedi' });
+  }
 });
 
 router.get('/reports/:filename', requireAdmin, (req, res) => {
@@ -112,6 +142,17 @@ router.get('/personnel/:id', requireAdmin, async (req, res) => {
     res.json(row);
   } catch (error) {
     res.status(500).json({ error: 'Detay alınamadı' });
+  }
+});
+
+router.delete('/personnel/:id', requireAdmin, async (req, res) => {
+  try {
+    const { error } = await db.from('personnel').delete().eq('id', req.params.id);
+    if (error) throw error;
+    res.json({ success: true, message: 'Kayıt başarıyla silindi' });
+  } catch (error) {
+    logger.error('Delete Personnel Error:', error);
+    res.status(500).json({ error: 'Silme işlemi başarısız' });
   }
 });
 

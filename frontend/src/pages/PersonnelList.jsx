@@ -163,12 +163,28 @@ export default function PersonnelList() {
                       {p.ai_summary ? p.ai_summary.substring(0, 70) + '…' : '—'}
                     </td>
                     <td>
-                      <button
-                        className="btn btn-sm"
-                        onClick={() => navigate(`/admin/personnel/${p.id}`)}
-                      >
-                        Detay
-                      </button>
+                      <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        <button
+                          className="btn btn-sm"
+                          onClick={() => navigate(`/admin/personnel/${p.id}`)}
+                        >
+                          Detay
+                        </button>
+                        <button
+                          className="btn btn-sm btn-ghost"
+                          style={{ color: '#ef4444' }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (window.confirm(`${p.name} kaydını silmek istediğinize emin misiniz?`)) {
+                              adminApi.deletePersonnel(p.id)
+                                .then(() => fetchData())
+                                .catch(err => alert('Silme işlemi başarısız: ' + err.message));
+                            }
+                          }}
+                        >
+                          Sil
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
