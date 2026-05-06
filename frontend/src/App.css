@@ -720,3 +720,150 @@ input:focus {
   color: var(--gray-400);
   font-style: italic;
 }
+
+/* ─── Mobile Responsiveness ──────────────────────────────── */
+.mobile-menu-toggle {
+  display: none;
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 300;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  border: none;
+  font-size: 1.5rem;
+  box-shadow: 0 4px 12px rgba(227, 30, 36, 0.3);
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+}
+
+.menu-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 150;
+}
+
+@media (max-width: 768px) {
+  .mobile-menu-toggle { display: flex; }
+  .menu-overlay { display: block; }
+
+  .admin-sidebar {
+    position: fixed;
+    left: -280px;
+    top: 0;
+    bottom: 0;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 10px 0 30px rgba(0,0,0,0.1);
+  }
+  .admin-sidebar.open {
+    transform: translateX(280px);
+  }
+
+  .admin-content {
+    padding: 1rem;
+    padding-top: 5rem;
+  }
+
+  .admin-page-title {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .header-actions {
+    width: 100%;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .header-actions .btn {
+    width: 100%;
+    margin: 0 !important;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .filter-row {
+    flex-direction: column;
+    align-items: stretch !important;
+    gap: 1rem;
+  }
+  .filter-row .form-group {
+    min-width: 0;
+    margin-bottom: 0;
+  }
+  .filter-row .btn {
+    width: 100%;
+    margin-top: 0.5rem;
+  }
+
+  .card {
+    padding: 1.25rem;
+  }
+
+  .compare-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .analysis-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .rec-winner {
+    font-size: 1.4rem;
+  }
+
+  .score-val {
+    font-size: 1.5rem;
+  }
+  .score-box {
+    padding: 1rem 0.5rem;
+  }
+  
+  .table-meta {
+    margin-bottom: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .q-text {
+    font-size: 1.25rem;
+  }
+  
+  .likert-grid {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+  
+  .likert-btn {
+    padding: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    text-align: left;
+  }
+  .likert-num { margin-bottom: 0; width: 30px; }
+}
