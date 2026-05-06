@@ -73,9 +73,6 @@ export default function AdminLogin() {
           </button>
         </form>
 
-        <p className="info-note" style={{ marginTop: '1rem' }}>
-          Varsayılan: admin / admin123
-        </p>
       </div>
     </div>
   );
