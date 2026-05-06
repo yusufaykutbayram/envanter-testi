@@ -93,14 +93,15 @@ export default function Dashboard() {
       <div className="card">
         <h3 className="section-title">Son Yapılan Testler</h3>
         {data.recentTests?.length > 0 ? (
-          <table className="admin-table">
+        <div className="table-responsive" style={{ minWidth: 'auto' }}>
+          <table className="admin-table" style={{ minWidth: '600px' }}>
             <thead>
               <tr>
                 <th>Ad Soyad</th>
                 <th>Yaş</th>
                 <th>Pozisyon</th>
                 <th>Tarih</th>
-                <th></th>
+                <th className="td-actions"></th>
               </tr>
             </thead>
             <tbody>
@@ -109,10 +110,10 @@ export default function Dashboard() {
                   <td className="td-name">{p.name}</td>
                   <td>{p.age}</td>
                   <td>
-                    <span className={`badge badge-${p.position.toLowerCase()}`}>{p.position}</span>
+                    <span className="badge badge-gray">{p.position}</span>
                   </td>
                   <td>{new Date(p.created_at).toLocaleDateString('tr-TR')}</td>
-                  <td>
+                  <td className="td-actions">
                     <button
                       className="btn btn-sm"
                       onClick={() => navigate(`/admin/personnel/${p.id}`)}
@@ -124,6 +125,7 @@ export default function Dashboard() {
               ))}
             </tbody>
           </table>
+        </div>
         ) : (
           <p className="no-data">Henüz test yapılmamış</p>
         )}
